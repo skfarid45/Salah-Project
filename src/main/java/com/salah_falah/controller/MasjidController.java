@@ -1,6 +1,7 @@
 package com.salah_falah.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salah_falah.dto.MasjidDto;
+import com.salah_falah.dto.MasjidWithTimingDto;
 import com.salah_falah.dto.PrayerTimingDto;
 import com.salah_falah.entity.Masjid;
 import com.salah_falah.entity.PrayerTiming;
@@ -78,4 +80,37 @@ public class MasjidController {
 		return ResponseEntity.ok(service.getTimingsForMasjid(id));
 	}
 
+	
+	@PostMapping("/create-with-timings")
+	public ResponseEntity<Map<String, Object>> createWithTimings(
+	        @RequestBody @Validated MasjidWithTimingDto dto,
+	        HttpServletRequest req) {
+
+	    Masjid masjid = Masjid.builder()
+	            .name(dto.getName())
+	            .address(dto.getAddress())
+	            .latitude(dto.getLatitude())
+	            .longitude(dto.getLongitude())
+	            .cityId(dto.getCityId())
+	            .build();
+
+	    PrayerTiming timing = PrayerTiming.builder()
+	            .date(dto.getDate())
+	            .fajr(dto.getFajr())
+	            .dhuhr(dto.getDhuhr())
+	            .asr(dto.getAsr())
+	            .maghrib(dto.getMaghrib())
+	            .isha(dto.getIsha())
+	            .sunrise(dto.getSunrise())
+	            .createdBy(req.getRemoteAddr())
+	            .build();
+
+	    Map<String, Object> response = service.createMasjidWithTimings(masjid, timing);
+
+	    return ResponseEntity.ok(response);
+	}
+
+
+	
+	
 }

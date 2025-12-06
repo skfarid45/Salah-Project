@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,38 +22,47 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "prayer_timing",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"masjid_id", "date"}))
-@Getter 
-@Setter 
-@NoArgsConstructor 
-@AllArgsConstructor 
+@Table(name = "prayer_timing", uniqueConstraints = @UniqueConstraint(columnNames = { "masjid_id", "date" }))
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PrayerTiming {
-	
-	 @Id 
-	 @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
 
-	    @Column(name = "masjid_id")
-	    private Long masjidId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-	    private LocalDate date;
-	    private LocalTime fajr;
-	    private LocalTime dhuhr;
-	    private LocalTime asr;
-	    private LocalTime maghrib;
-	    private LocalTime isha;
-	    private LocalTime sunrise;
+	@Column(name = "masjid_id")
+	private Long masjidId;
 
-	    private String createdBy;
-	    private LocalDateTime createdAt;
-	    private LocalDateTime updatedAt;
+	private LocalDate date;
+	@JsonFormat(pattern = "hh:mm a")
+	private LocalTime fajr;
+	@JsonFormat(pattern = "hh:mm a")
+	private LocalTime dhuhr;
+	@JsonFormat(pattern = "hh:mm a")
+	private LocalTime asr;
+	@JsonFormat(pattern = "hh:mm a")
+	private LocalTime maghrib;
+	@JsonFormat(pattern = "hh:mm a")
+	private LocalTime isha;
+	@JsonFormat(pattern = "hh:mm a")
+	private LocalTime sunrise;
 
-	    @PrePersist
-	    public void prePersist() { createdAt = updatedAt = LocalDateTime.now(); }
-	    @PreUpdate
-	    public void preUpdate() { updatedAt = LocalDateTime.now(); }
-	
+	private String createdBy;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
+
+	@PrePersist
+	public void prePersist() {
+		createdAt = updatedAt = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		updatedAt = LocalDateTime.now();
+	}
 
 }

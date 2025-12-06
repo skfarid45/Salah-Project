@@ -1,6 +1,7 @@
 package com.salah_falah.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,37 @@ public class MasjidService {
     }
 	
 	
+    
+    
+    @Transactional
+    public Map<String, Object> createMasjidWithTimings(Masjid masjid, PrayerTiming timing) {
+
+        // 1. Save Masjid
+        Masjid savedMasjid = masjidRepo.save(masjid);
+
+        // 2. Save or Update Timing (Upsert)
+        PrayerTiming savedTiming = timingRepo.findByMasjidIdAndDate(savedMasjid.getId(), timing.getDate())
+                .map(existing -> {
+                    existing.setFajr(timing.getFajr());
+                    existing.setDhuhr(timing.getDhuhr());
+                    existing.setAsr(timing.getAsr());
+                    existing.setMaghrib(timing.getMaghrib());
+                    existing.setIsha(timing.getIsha());
+                    existing.setSunrise(timing.getSunrise());
+                    return timingRepo.save(existing);
+                })
+                .orElseGet(() -> {
+                    timing.setMasjidId(savedMasjid.getId());
+                    return timingRepo.save(timing);
+                });
+
+        return Map.of(
+                "masjid", savedMasjid,
+                "timing", savedTiming
+        );
+    }
+
+    
 	
 	
 }
